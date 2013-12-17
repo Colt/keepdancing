@@ -1,0 +1,104 @@
+<!doctype html>
+<script type="text/javascript" src="howler.js"></script>
+<script type="text/javascript" src="js/paper.js"></script>
+<script src="http://jeromeetienne.github.com/tquery/build/tquery-bundle-require.js"></script>
+<script>
+
+var sound1 = new Howl({
+  urls: ['02 Eleanor Rigby.mp3', 'Tom_PCM_3.wav']
+});
+var sound2 = new Howl({
+  urls: ['05 Sea Of Love.mp3', 'Tom_PCM_3.wav']
+});
+
+// sound1.play();
+
+</script>
+<script>
+// trick to get cors on github content
+requirejs.config({ baseUrl : "http://www.corsproxy.com/jeromeetienne.github.com/tquery/plugins/requirejs/examples/" });
+
+last2 = 0;
+xpos = 1;
+lastx = 0;
+lasty = 0;
+times = 0;
+stopped = false;
+national = false;
+
+
+
+require(['tquery.headtrackr'], function(){
+    // init the world
+    var world    = tQuery.createWorld().boilerplate().start();
+    var last = 0;
+
+    // create the headTracker
+    var headTracker    = tQuery.createHeadtrackr().start();
+    headTracker.debugView(true);
+
+
+
+    // add a cube in the world scene
+    var object    = tQuery.createCube().addTo(world);
+    // make the camera move depending on facetrackingEvent
+    headTracker.addEventListener("found", function(event){
+      // console.log(event);
+      console.log("*************");
+
+      if(times == 20){
+        if(event.x==lastx && event.y==lasty){
+            // console.log("MOVE BITCH!");
+
+            if(national)
+            {
+              sound2.stop();
+              console.log("PLAYING");
+              sound1.play();
+              national = false;
+            }
+
+            else{
+              sound1.stop();
+              console.log("PLAYING");
+              sound2.play();
+              national = true;
+            }
+
+            stopped = true;
+            // if(source.playbackRate.value - 0.1 > 0){
+            //     source.playbackRate.value -= 0.1;
+            // }
+        }
+        times = 0;
+      }
+
+      if(event.x != lastx || event.y != lasty ) {
+        lastx = event.x;
+        lasty = event.y;
+        // source.playbackRate.value += 0.1;
+        // if(stopped){
+        //   sound.play();
+        //   stopped = false;
+        // }
+      }
+
+      // if(event.y != lasty) {
+      //   lasty = event.y;
+      //   // source.playbackRate.value -= 0.1;
+      //   if(stopped){
+      //     sound.play();
+      //     stopped = false;
+      //   }
+      // }
+      times++;
+
+        object.rotationZ(event.angle)
+            .positionX(event.x).positionY(event.y)
+            .scaleX(event.width).scaleY(event.height);
+                });
+
+});
+
+</script>
+<body></body>
